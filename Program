@@ -1,0 +1,788 @@
+#include <iostream>
+#include <ctime>
+#include <chrono>
+#include <thread>
+#include <string>
+#include <fstream> 
+#include <iomanip>
+
+using namespace std;
+using namespace chrono;
+
+int *quickSort(int *, int);
+bool binarySearch(int *arr, int size, int value);
+void printMatrix(int **, int, bool = 1);
+void clearMatrix(int **, int);
+void spiralMatrix(int **, int);
+void snakeMatrix(int **, int);
+void rotateMatrix(int **, int, char);
+void sortMatrix(int **, int);
+void increaseMatrix(int **, int, int);
+void multiplyMatrices(int **, int **, int);
+void DeleteSpace(string);
+void DeleteSign(string);
+void Register(string);
+void UpFirst(string);
+void Search(string);
+
+string text;
+
+int main()
+{
+	setlocale(0, "");
+	cout << "\n№1. ТИПЫ ДАННЫХ И ИХ ВНУТРЕННЕЕ ПРЕДСТАВЛЕНИЕ В ПАМЯТИ\n"
+		<< "№2. ОДНОМЕРНЫЕ СТАТИЧЕСКИЕ МАССИВЫ\n"
+		<< "№3. ДВУМЕРНЫЕ СТАТИЧЕСКИЕ МАССИВЫ. УКАЗАТЕЛИ\n"
+		<< "№4. ТЕКСТОВЫЕ СТРОКИ КАК МАССИВЫ СИМВОЛОВ" << endl;
+Menu_of_LabWorks:
+	{
+		cout << "\n\nВыберите номер лабораторной работы\n" << endl;
+	}
+
+	int variant;
+	cin >> variant;
+	switch (variant) {
+	case 1:
+	{
+		cout << "Лабораторная работа №1\n\n" << endl;
+
+		cout << "int " << sizeof(int) << endl << "short int " << sizeof(short int) << endl << "long int " << sizeof(long int) << endl << "float " << sizeof(float) 
+			<< endl << "double " << sizeof(double) << endl << "long double " << sizeof(long double) << endl << "char " << sizeof(char) 
+			<< endl << "bool " << sizeof(bool) << endl << endl;
+
+		int value;
+		cout << "Bведите целое число" << endl;
+		cin >> value;
+		unsigned int order = 32;
+		unsigned int mask = 1 << order - 1;
+		for (int i = 1; i <= order; i++)
+		{
+			putchar(value & mask ? '1' : '0');
+			value <<= 1;
+			if (i % 8 == 0)
+			{
+				cout << " ";
+			}
+			if (i % order - 1 == 0)
+			{
+				cout << " ";
+			}
+		}
+		cout << "\n\n";
+
+		union
+		{
+			float value1;
+			int b;
+		};
+		cout << "Bведите число типа float" << endl;
+		cin >> value1;
+		unsigned int a = sizeof(value1) * 8;
+		int mask1 = 1 << a - 1;
+
+		for (int i = 0; i < a; i++)
+		{
+			if (i == 1)
+			{
+				cout << " - знак  ";
+			}
+			if (i % 9 == 0 && i < 10 && i > 2)
+			{
+				cout << " - экспонента  ";
+			}
+			if (b & mask1)
+			{
+				cout << 1;
+			}
+			else
+			{
+				cout << 0;
+			}
+			b <<= 1;
+		}
+		cout << " - мантисса" << "\n\n";
+
+		union
+		{
+			double value2;
+			int m[2];
+		};
+		cout << "Bведите число типа double" << endl;
+		cin >> value2;
+		int mask2 = 1 << (sizeof(int) * 8 - 1);
+		for (int i = 0; i < sizeof(int) * 8; i++)
+		{
+			cout << ((m[1] & mask2) ? 1 : 0);
+			if (i == 0)
+			{
+				cout << " - знак  ";
+			}
+			if (i > 2 && i < 12 && i % 11 == 0)
+			{
+				cout << " - экспонента  ";
+			}
+
+			m[1] <<= 1;
+		}
+
+		for (int i = 0; i < sizeof(int) * 8; i++)
+		{
+			cout << ((m[0] & mask2) ? 1 : 0);
+			m[0] <<= 1;
+		}
+		cout << " - мантисса" << "\n";
+
+		goto Menu_of_LabWorks;
+	}
+	case 2:
+	{
+		cout << "Лабораторная работа №2\n\n" << endl;
+
+		const int n = 100;
+		srand(time(0));
+		int arr[n], arrSorted[n];
+
+		cout << "1. Создать массив\n";
+		cout << "2. Отсортировать массив\n";
+		cout << "3. Найти максимальный и минимальный элементы массива\n";
+		cout << "4. Найти среднее значение максимального и минимального элементов\n";
+		cout << "5. Найти количество элементов меньших числа a\n";
+		cout << "6. Найти количество элементов больших числа b\n";
+		cout << "7. Поиск заданного числа в массиве\n";
+		cout << "8. Поменять местами элементы массива\n";
+
+	Menu:
+		{
+			cout << "\n";
+			cout << "Введите номер операции: ";
+		}
+
+		int input;
+		cin >> input;
+		switch (input)
+		{
+
+		case 1:
+		{
+			cout << "\n";
+			srand(time(0));
+			for (int i = 0; i < n; i++)
+			{
+				arr[i] = rand() % 199 - 99;
+				cout << arr[i] << " ";
+			}
+			for (int i = 0; i < n; i++)
+				arrSorted[i] = arr[i];
+			cout << "\n";
+			goto Menu;
+		}
+
+		case 2:
+		{
+			cout << "\n";
+			auto start = chrono::steady_clock::now();
+			quickSort(arrSorted, n);
+			auto end = chrono::steady_clock::now();
+			duration<double> sec = end - start;
+			for (int i = 0; i < n; i++)
+				cout << arrSorted[i] << " ";
+			cout << "\n";
+			cout << "Время выполнения: " << chrono::duration_cast<chrono::microseconds>(end - start).count() << " микросекунд";
+			cout << "\n";
+			goto Menu;
+		}
+
+		case 3:
+		{
+			cout << "\n";
+			int max(-100), min(100);
+			auto start = chrono::steady_clock::now();
+			for (int i = 0; i < n; i++)
+			{
+				if (arr[i] > max)
+					max = arr[i];
+				if (arr[i] < min)
+					min = arr[i];
+			}
+			auto end = chrono::steady_clock::now();
+			cout << "Максимальный элемент: " << max << "\n" << "Минимальный элемент: " << min << "\n" << "Время поиска в неотсортированном массиве: " << chrono::duration_cast<chrono::nanoseconds>(end - start).count() << " наносекунд" << endl;
+
+			max = -100, min = 100;
+			quickSort(arrSorted, n);
+			auto startA = chrono::steady_clock::now();
+			for (int i = 0; i < n; i++)
+			{
+				if (arrSorted[i] > max)
+					max = arrSorted[i];
+				if (arrSorted[i] < min)
+					min = arrSorted[i];
+			}
+			auto endA = chrono::steady_clock::now();
+			cout << "Время поиска в отсортированном массиве: " << chrono::duration_cast<chrono::nanoseconds>(endA - startA).count() << " наносекунд" << endl;
+			goto Menu;
+		}
+
+		case 4:
+		{
+			cout << "\n";
+			quickSort(arrSorted, n);
+			int mean = round((arrSorted[0] + arrSorted[99]) / 2);
+			int count = 0;
+			cout << "Среднее значение min & max: " << mean << endl;
+			cout << "Индексы элементов, равных среднему значению: ";
+			for (int i = 0; i < n; i++)
+			{
+				if (arr[i] == mean)
+					cout << i << " ";
+			}
+			auto start = chrono::steady_clock::now();
+			for (int i = 0; i < n; i++)
+			{
+				if (arr[i] == mean)
+					count++;
+			}
+			auto end = chrono::steady_clock::now();
+			duration<double> sec = end - start;
+			if (count == 0)
+			{
+				cout << "таких элементов не найдено" << "\n" << "Время поиска: " << chrono::duration_cast<chrono::nanoseconds>(end - start).count() << " наносекунд";
+				cout << "\n";
+				goto Menu;
+			}
+			cout << "\n";
+			cout << "Количество элементов: " << count << "\n" << "Время поиска: " << chrono::duration_cast<chrono::nanoseconds>(end - start).count() << " наносекунд";
+			cout << "\n";
+			goto Menu;
+		}
+
+		case 5:
+		{
+			int a, countA = 0;
+			quickSort(arrSorted, n);
+			cout << "\n" << "Введите число, количество элементов меньше которого вы хотите увидеть: ";
+			cin >> a;
+			for (int i = 0; i < n; i++)
+				if (arrSorted[i] < a)
+					countA++;
+			cout << "Количество элементов, меньших введённого числа: " << countA << endl;
+			goto Menu;
+		}
+
+		case 6:
+		{
+			int b, countB = 0;
+			quickSort(arrSorted, n);
+			cout << "\n" << "Введите число, количество элементов больше которого вы хотите увидеть: ";
+			cin >> b;
+			for (int i = 0; i < n; i++)
+			{
+				if (arrSorted[i] > b)
+					countB++;
+			}
+			cout << "Количество элементов, больших введённого числа: " << countB << endl;
+			goto Menu;
+		}
+
+		case 7:
+		{
+			int SearchVal;
+			cout << "\nВведите искомое число: ";
+			cin >> SearchVal;
+			quickSort(arrSorted, n);
+			cout << ((binarySearch(arrSorted, n, SearchVal) ? "В массиве присутствует данное число" : "Такого числа нет")) << endl;
+			auto start = chrono::steady_clock::now();
+			binarySearch(arrSorted, n, SearchVal);
+			auto end = chrono::steady_clock::now();
+			cout << "\nВремя работы бинарного поиска: " << chrono::duration_cast<chrono::nanoseconds>(end - start).count() << " наносекунд" << endl;
+
+			start = chrono::steady_clock::now();
+			bool flag = false;
+			for (int i = 0; i < n; i++)
+			{
+				if (arrSorted[i] == SearchVal)
+				{
+					flag = true;
+				}
+			}
+			end = chrono::steady_clock::now();
+			cout << "Время поиска перебором: ";
+			cout << chrono::duration_cast<chrono::nanoseconds>(end - start).count() << " наносекунд" << endl;
+			goto Menu;
+		}
+
+		case 8:
+		{
+			int m, p;
+			cout << "\nВведите индексы элементов, которые хотите поменять:" << endl;
+			cin >> m >> p;
+
+			while (!(m >= 0 && m < 100 && p >= 0 && p < 100))
+			{
+				cout << "\nВы ввели несуществующие индексы. Попробуйте снова: ";
+				cin >> m >> p;
+			}
+			auto start = chrono::steady_clock::now();
+			int j = arr[m];
+			arr[m] = arr[p];
+			arr[p] = j;
+			auto end = chrono::steady_clock::now();
+			cout << "\nПолученный массив:" << endl;
+			for (int i = 0; i < n; i++)
+				cout << arr[i] << " ";
+			cout << "\nВремя выполнения: " << duration_cast<nanoseconds>(end - start).count() << " наносекунд" << endl;
+			goto Menu;
+		}
+
+		default:
+		{
+			exit;
+		}
+		}
+
+		goto Menu_of_LabWorks;
+	}
+	case 3:
+	{
+		cout << "Лабораторная работа №3\n\n" << endl;
+
+		srand(time(0));
+		int N;
+		cout << "Enter N(6, 8 or 10):" << "\n";
+		cin >> N;
+		while (N != 6 && N != 8 && N != 10) {
+			cout << "Wrong N value, try again" << "\n";
+			cin >> N;
+		}
+		int **matrix = new int *[N];
+		for (int **cur = matrix, **end = cur + N - 1; cur <= end; cur++) *cur = new int[N];
+		string fillType;
+		cout << "Choose how to fill the array(a or b):" << endl;
+		cin >> fillType;
+		while (fillType != "a" && fillType != "b") {
+			cout << "Wrong value, try again(a, b)" << endl;
+			cin >> fillType;
+		}
+		clearMatrix(matrix, N);
+		if (fillType == "a") {
+			spiralMatrix(matrix, N);
+		}
+		else snakeMatrix(matrix, N);
+
+		string rotateOption;
+		cout << "Choose how to rotate matrix(a, b, c, d):" << endl;
+		cin >> fillType;
+		while (fillType != "a" && fillType != "b" && fillType != "c" && fillType != "d") {
+			cout << "Wrong value, try again(a, b)" << endl;
+			cin >> fillType;
+		}
+		cout << "Rotated matrix: " << '\n';
+		rotateMatrix(matrix, N, fillType[0]);
+		cout << '\n' << "Sorted matrix: " << '\n';
+		sortMatrix(matrix, N);
+		cout << '\n' << "Enter a value to increase matrix elements: ";
+		int k;
+		cin >> k;
+		increaseMatrix(matrix, N, k);
+		cout << '\n' << "Filling the matrix from 1 to N^2:" << '\n';
+		system("Pause");
+		clearMatrix(matrix, N);
+		spiralMatrix(matrix, N);
+		printMatrix(matrix, N);
+		int **newMatrix = new int *[N];
+		for (int **cur = newMatrix, **end = cur + N - 1; cur <= end; cur++) *cur = new int[N];
+		clearMatrix(newMatrix, N);
+		spiralMatrix(newMatrix, N);
+		multiplyMatrices(matrix, newMatrix, N);
+		system("Pause");
+
+		goto Menu_of_LabWorks;
+	}
+	case 4:
+	{
+		cout << "Лабораторная работа №4\n\n" << endl;
+
+		/*  1 задание  */
+		{
+			int input;
+		Menu_LR4:
+			{
+				cout << "Ввести текст вручную или прочитать его из файла?\n"
+					"1. Ввести\n"
+					"2. Прочитать из файла\n";
+				cin >> input;
+			}
+			if (input == 1)
+			{
+				cin.ignore();
+				getline(cin, text);
+			}
+			else if (input == 2)
+			{
+				ifstream in("D:\\Program_LR_4\\test.txt");
+				if (in.is_open())
+					getline(in, text);
+				in.close();
+			}
+			else
+				goto Menu_LR4;
+			cout << "Задание 1. Исходная строка: " << text << "\n";
+		}
+
+		{
+			DeleteSpace(text);
+			DeleteSign(text);
+			Register(text);
+
+			cout << "Задание 2. Отредактированная строка: " << text << "\n";
+		}
+
+		{
+			cout << "Задание 3. Cтрока в обратном порядке: ";
+			int a = 0;
+			text += " ";
+
+			for (int i = text.length(); i >= 0; i--)
+			{
+				if (text[i] == ' ')
+				{
+					for (int k = i + 1; k <= (i + a); k++)
+						cout << text[k];
+					a = 0;
+				}
+				a++;
+			}
+			for (int i = 0; i < text.length(); i++)
+			{
+				if (text[i] == ' ') break;
+				cout << text[i];
+			}
+		}
+
+		{
+			UpFirst(text);
+
+			cout << "\nЗадание 4. Все слова с заглавной буквы: " << text << "\n";
+		}
+
+		goto Menu_of_LabWorks;
+	}
+	case 5:
+		cout << "Выход из программы" << endl;
+		exit(EXIT_SUCCESS);
+		break;
+	default:
+		cerr << "Вы выбрали неверный вариант" << endl;
+		exit(EXIT_FAILURE);
+	}
+	return 0;
+}
+
+
+
+// Функции из Лабораторной работы №2
+
+int *quickSort(int *arr, int size)
+{
+	double mean = 0;
+	for (int i = 0; i < size; ++i) mean += abs(arr[i]);
+	mean /= size;
+	int refNum = 0, refNumIndex;
+	for (int i = 0; i < size; ++i)
+	{
+		if (abs(abs(arr[i]) - abs(mean)) < abs(abs(refNum) - abs(mean)))
+		{
+			refNum = arr[i];
+			refNumIndex = i;
+		}
+	}
+	int countOfLower = 0, countOfHigher = 0;
+	for (int i = 0; i < size; ++i)
+	{
+		if (i != refNumIndex)
+		{
+			if (arr[i] >= refNum)
+				countOfHigher++;
+			else countOfLower++;
+		}
+	}
+
+	int *lowerValues = new int[countOfLower];
+	int *higherValues = new int[countOfHigher];
+	int j = 0, k = 0;
+	for (int i = 0; i < size; ++i)
+	{
+		if (i != refNumIndex)
+		{
+			if (arr[i] >= refNum)
+			{
+				higherValues[j] = arr[i];
+				j++;
+			}
+			else
+			{
+				lowerValues[k] = arr[i];
+				k++;
+			}
+		}
+	}
+	if (countOfLower > 2)
+		quickSort(lowerValues, countOfLower);
+
+	else if (countOfLower == 2)
+	{
+		if (lowerValues[0] > lowerValues[1])
+		{
+			int t = lowerValues[0];
+			lowerValues[0] = lowerValues[1];
+			lowerValues[1] = t;
+		}
+	}
+	if (countOfHigher > 2)
+		quickSort(higherValues, countOfHigher);
+
+	else if (countOfHigher == 2)
+	{
+		if (higherValues[0] > higherValues[1])
+		{
+			int t = higherValues[0];
+			higherValues[0] = higherValues[1];
+			higherValues[1] = t;
+		}
+	}
+	for (int i = 0; i < countOfLower; ++i) arr[i] = lowerValues[i];
+	arr[countOfLower] = refNum;
+	for (int i = countOfLower + 1; i < size; ++i) arr[i] = higherValues[i - countOfLower - 1];
+	return arr;
+}
+
+bool binarySearch(int *arr, int size, int value)
+{
+	int middleNumIndex = int(ceil(size / 2.0));
+	int middleNumValue = arr[middleNumIndex - 1];
+	while (size > 2)
+	{
+		if (value < middleNumValue)
+		{
+			middleNumIndex -= int(ceil(size / 4.0));
+			middleNumValue = arr[middleNumIndex - 1];
+			size = int(ceil(size / 2.0));
+		}
+		else if (value > middleNumValue)
+		{
+			middleNumIndex += int(ceil(size / 4.0));
+			middleNumValue = arr[middleNumIndex - 1];
+			size -= int(ceil(size / 2.0));;
+		}
+		else return true;
+	}
+	if (arr[middleNumIndex - 1] == value)
+		return true;
+	return false;
+}
+
+// Функции из Лабораторной работы №3
+
+void printMatrix(int **matrix, int N, bool clear) {
+	if (clear) system("cls");
+	for (int **curi = matrix, **endi = curi + N - 1; curi <= endi; curi++) {
+		for (int *curj = *curi, *endj = curj + N - 1; curj <= endj; curj++) {
+			cout << setw(3) << *curj;
+			if (curj != endj) cout << " ";
+		}
+		cout << "\n";
+	}
+	std::this_thread::sleep_for(0.1s);
+}
+
+void clearMatrix(int **matrix, int N) {
+	for (int **curi = matrix, **endi = curi + N - 1; curi <= endi; curi++)
+		for (int *curj = *curi, *endj = curj + N - 1; curj <= endj; curj++) *curj = 0;
+}
+
+void spiralMatrix(int **matrix, int N) {
+	printMatrix(matrix, N);
+	int lineNum = 0;
+	for (int j = 0; j < N / 2; ++j) {
+		for (int *curi = *(matrix + lineNum) + lineNum, *endi = curi + N - 2 * lineNum; curi < endi; curi++) {
+			*curi = rand() % N * N + 1;
+			printMatrix(matrix, N);
+		}
+		for (int **curi = matrix + lineNum + 1, **endi = matrix + N - 2 - lineNum; curi <= endi; curi++) {
+			*(*curi + N - lineNum - 1) = rand() % N * N + 1;
+			printMatrix(matrix, N);
+		}
+		for (int *curi = *(matrix + N - lineNum - 1) + N - lineNum - 1, *endi = curi - N + 1 + 2 * lineNum; curi > endi; curi--) {
+			*curi = rand() % N * N + 1;
+			printMatrix(matrix, N);
+		}
+		for (int **curi = matrix + N - 1 - lineNum, **endi = matrix + lineNum + 1; curi >= endi; curi--) {
+			*(*curi + lineNum) = rand() % N * N + 1;
+			printMatrix(matrix, N);
+		}
+		lineNum++;
+	}
+}
+
+void snakeMatrix(int **matrix, int N) {
+	printMatrix(matrix, N);
+	for (int lineNum = 0; lineNum < N / 2; ++lineNum) {
+		for (int **curi = matrix, **endi = matrix + N - 1; curi <= endi; curi++) {
+			*(*curi + lineNum * 2) = rand() % N * N + 1;
+			printMatrix(matrix, N);
+		}
+		for (int **curi = matrix + N - 1, **endi = matrix; curi >= endi; curi--) {
+			*(*curi + lineNum * 2 + 1) = rand() % N * N + 1;
+			printMatrix(matrix, N);
+		}
+	}
+}
+
+void rotateMatrix(int **matrix, int N, char option) {
+	int **a = new int *[N / 2], **b = new int *[N / 2], **c = new int *[N / 2], **d = new int *[N / 2], ***arr = new int **[4];
+	arr[0] = a; arr[1] = b; arr[2] = c; arr[3] = d;
+	for (int ***i = arr, ***iEnd = arr + 3; i <= iEnd; i++)
+		for (int **cur = *i, **end = cur + N / 2 - 1; cur <= end; cur++) *cur = new int[N / 2];
+
+	for (int **curi = matrix, **endi = curi + N / 2 - 1, **curArray = a; curi <= endi; curi++, curArray++)
+		for (int *curj = *curi, *endj = curj + N / 2 - 1, *curArrayJ = *curArray; curj <= endj; curj++, curArrayJ++)
+			*curArrayJ = *curj;
+
+	for (int **curi = matrix, **endi = curi + N / 2 - 1, **curArray = b; curi <= endi; curi++, curArray++)
+		for (int *curj = *curi + N / 2, *endj = curj + N / 2 - 1, *curArrayJ = *curArray; curj <= endj; curj++, curArrayJ++)
+			*curArrayJ = *curj;
+
+	for (int **curi = matrix + N / 2, **endi = curi + N / 2 - 1, **curArray = c; curi <= endi; curi++, curArray++)
+		for (int *curj = *curi, *endj = curj + N / 2 - 1, *curArrayJ = *curArray; curj <= endj; curj++, curArrayJ++)
+			*curArrayJ = *curj;
+
+	for (int **curi = matrix + N / 2, **endi = curi + N / 2 - 1, **curArray = d; curi <= endi; curi++, curArray++)
+		for (int *curj = *curi + N / 2, *endj = curj + N / 2 - 1, *curArrayJ = *curArray; curj <= endj; curj++, curArrayJ++)
+			*curArrayJ = *curj;
+
+	int **pa, **pb, **pc, **pd;
+	if (option == 'a') {
+		pa = c; pb = a; pc = d; pd = b;
+	}
+	else if (option == 'b') {
+		pa = d; pb = c; pc = b; pd = a;
+	}
+	else if (option == 'c') {
+		pa = c; pb = d; pc = a; pd = b;
+	}
+	else pa = b; pb = a; pc = d; pd = c;
+	for (int **curi = matrix, **endi = curi + N / 2 - 1, **curArray = pa; curi <= endi; curi++, curArray++)
+		for (int *curj = *curi, *endj = curj + N / 2 - 1, *curArrayJ = *curArray; curj <= endj; curj++, curArrayJ++)
+			*curj = *curArrayJ;
+
+	for (int **curi = matrix, **endi = curi + N / 2 - 1, **curArray = pb; curi <= endi; curi++, curArray++)
+		for (int *curj = *curi + N / 2, *endj = curj + N / 2 - 1, *curArrayJ = *curArray; curj <= endj; curj++, curArrayJ++)
+			*curj = *curArrayJ;
+
+	for (int **curi = matrix + N / 2, **endi = curi + N / 2 - 1, **curArray = pc; curi <= endi; curi++, curArray++)
+		for (int *curj = *curi, *endj = curj + N / 2 - 1, *curArrayJ = *curArray; curj <= endj; curj++, curArrayJ++)
+			*curj = *curArrayJ;
+
+	for (int **curi = matrix + N / 2, **endi = curi + N / 2 - 1, **curArray = pd; curi <= endi; curi++, curArray++)
+		for (int *curj = *curi + N / 2, *endj = curj + N / 2 - 1, *curArrayJ = *curArray; curj <= endj; curj++, curArrayJ++)
+			*curj = *curArrayJ;
+
+	printMatrix(matrix, N, 0);
+}
+
+void sortMatrix(int **matrix, int N) {
+	int *arr = new int[N * N];
+	int i = 0;
+	for (int **curi = matrix, **endi = curi + N - 1; curi <= endi; curi++) {
+		for (int *curj = *curi, *endj = curj + N - 1; curj <= endj; curj++) {
+			*(arr + i) = *curj;
+			i++;
+		}
+	}
+	bool isChanged = 1;
+	while (isChanged) {
+		isChanged = 0;
+		for (int *j = arr, *jEnd = j + (N * N) - 2; j <= jEnd; j++) {
+			if (*j > *(j + 1)) {
+				isChanged = 1;
+				int t = *(j + 1);
+				*(j + 1) = *j;
+				*j = t;
+			}
+		}
+	}
+
+	i = 0;
+	for (int **curi = matrix, **endi = curi + N - 1; curi <= endi; curi++) {
+		for (int *curj = *curi, *endj = curj + N - 1; curj <= endj; curj++) {
+			*curj = *(arr + i);
+			i++;
+		}
+	}
+	printMatrix(matrix, N, 0);
+}
+
+void increaseMatrix(int **matrix, int N, int k) {
+	for (int **curi = matrix, **endi = curi + N - 1; curi <= endi; curi++)
+		for (int *curj = *curi, *endj = curj + N - 1; curj <= endj; curj++) *curj += k;
+	printMatrix(matrix, N, 0);
+}
+
+void multiplyMatrices(int **matrix, int **newMatrix, int N) {
+	for (int **curi = matrix, **curk = newMatrix, **endi = curi + N - 1; curi <= endi; curi++, curk++) {
+		for (int *curj = *curi, *curl = *curk, *endj = curj + N - 1; curj <= endj; curj++, curl++) {
+			*curl *= *curj;
+			printMatrix(newMatrix, N, 1);
+		}
+	}
+}
+
+// Функции из Лабораторной работы №4
+
+void DeleteSpace(string txt)
+{
+	for (int i = 0; i < txt.size(); i++)
+	{
+		if (txt[i] == ' ' && txt[i + 1] == ' ')
+			while (txt[i + 1] == ' ')
+				txt.erase((i + 1), 1);
+	}
+	text = txt;
+}
+
+void DeleteSign(string txt)
+{
+	for (int i = 0; i <= txt.size(); i++)
+	{
+		if ((txt[i] == '.' || txt[i] == ',' || txt[i] == ';' || txt[i] == ':' || txt[i] == '!' || txt[i] == '?') && (txt[i + 1] == '.' || txt[i + 1] == ',' || txt[i + 1] == ';' || txt[i + 1] == ':' || txt[i + 1] == '!' || txt[i + 1] == '?'))
+			if (txt[i] == '.' && txt[i + 1] == '.' && txt[i + 2] == '.' && txt[i + 3] == ' ')
+				i += 3;
+			else
+			{
+				while (txt[i + 1] == '.' || txt[i + 1] == ',' || txt[i + 1] == ';' || txt[i + 1] == ':' || txt[i + 1] == '!' || txt[i + 1] == '?')
+					txt.erase((i + 1), 1);
+			}
+	}
+	text = txt;
+}
+
+void Register(string txt)
+{
+	for (int i = 0; i < txt.size(); i++)
+	{
+		if (txt[i] == ' ')
+			i += 2;
+		txt[i] = tolower(txt[i]);
+	}
+	text = txt;
+}
+
+void UpFirst(string txt)
+{
+	txt[0] = toupper(txt[0]);
+	for (int i = 0; i < txt.size(); i++)
+	{
+		if (txt[i] == ' ')
+			txt[i + 1] = toupper(txt[i + 1]);
+	}
+	text = txt;
+}
